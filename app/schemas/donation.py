@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, Extra, PositiveInt, validator
 
-from constants import DEFAULT_INVESTED_AMOUNT
+from app.constants import DEFAULT_INVESTED_AMOUNT
 
 
 class DonationBase(BaseModel):

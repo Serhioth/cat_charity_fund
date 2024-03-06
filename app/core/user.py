@@ -10,7 +10,7 @@ from fastapi_users.authentication import (
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from constants import TOKEN_LIFETIME, PASSWORD_MIN_LENGTH
+from app.constants import TOKEN_LIFETIME, PASSWORD_MIN_LENGTH
 from app.core.config import settings
 from app.core.db import get_async_session
 from app.models.user import User

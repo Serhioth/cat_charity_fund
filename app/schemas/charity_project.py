@@ -7,7 +7,7 @@ from pydantic import (BaseModel,
                       PositiveInt,
                       validator)
 
-from constants import DEFAULT_INVESTED_AMOUNT, NAME_MIN_LENGTH, NAME_MAX_LENGTH
+from app.constants import DEFAULT_INVESTED_AMOUNT, NAME_MIN_LENGTH, NAME_MAX_LENGTH
 
 
 class CharityProjectBase(BaseModel):
