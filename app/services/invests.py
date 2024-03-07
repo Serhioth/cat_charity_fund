@@ -24,7 +24,7 @@ async def get_oldest_unclosed(
 def close_object(
     obj: Union[CharityProject, Donation]
 ):
-    """Function for closeing fully invested objects."""
+    """Function for closing fully invested objects."""
     obj.fully_invested = True
     obj.close_date = datetime.now()
     return obj
@@ -55,4 +55,8 @@ async def make_invest(
                 obj_to_invest.invested_amount = obj_to_invest.full_amount
                 close_object(obj_to_invest)
                 break
+
+        await session.commit()
+        await session.refresh(obj_to_invest)
+
     return obj_to_invest

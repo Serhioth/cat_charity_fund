@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +9,8 @@ from app.api.validators import (
     check_description,
     check_name_duplicate,
     check_new_amount_greater_then_invested,
+    check_project_is_closed,
+    check_project_is_invested
 )
 from app.core.db import get_async_session
 from app.core.user import current_superuser
@@ -57,13 +61,11 @@ async def create_new_charity_project(
             unclosed_objects=unclosed_donations,
             session=session
         )
-        await session.commit()
-        await session.refresh(new_project)
 
     except IntegrityError:
         await session.rollback()
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail='Нет средств для распределения'
         )
 
@@ -106,11 +108,7 @@ async def partially_update_charity_project(
         session
     )
 
-    if charity_project.fully_invested:
-        raise HTTPException(
-            status_code=400,
-            detail='Закрытый проект нельзя редактировать!'
-        )
+    check_project_is_closed(charity_project.fully_invested)
 
     if obj_in.name is not None:
         await check_name_duplicate(
@@ -152,11 +150,8 @@ async def remove_charity_project(
         charity_project_id,
         session
     )
-    if charity_project.invested_amount > 0:
-        raise HTTPException(
-            status_code=400,
-            detail='В проект были внесены средства, не подлежит удалению!'
-        )
+    check_project_is_invested(charity_project.invested_amount)
+
     charity_project = await charity_project_crud.remove(
         charity_project,
         session

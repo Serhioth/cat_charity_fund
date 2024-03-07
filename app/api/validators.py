@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Optional
 
 from fastapi import HTTPException
@@ -34,7 +35,7 @@ async def charity_project_exists(
     )
     if charity_project is None:
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
             detail='Проект не найден!'
         )
     return charity_project
@@ -52,7 +53,7 @@ async def check_name_duplicate(
     )
     if charity_project_id is not None:
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             detail='Проект с таким именем уже существует!'
         )
 
@@ -62,6 +63,26 @@ def check_description(description: Optional[str]):
 
     if description is None or len(description) == 0:
         raise HTTPException(
-            status_code=422,
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail='Добавьте описание к проекту'
+        )
+
+
+def check_project_is_invested(invested_amount: int):
+    """Checking that no funds have been contributed to the project."""
+
+    if invested_amount > 0:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='В проект были внесены средства, не подлежит удалению!'
+        )
+
+
+def check_project_is_closed(investment_status: bool):
+    """Checking that project is not closed before editing."""
+
+    if investment_status:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Закрытый проект нельзя редактировать!'
         )

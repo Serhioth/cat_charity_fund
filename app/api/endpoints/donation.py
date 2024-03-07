@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -53,13 +54,11 @@ async def create_donation(
             unclosed_objects=unclosed_projects,
             session=session
         )
-        await session.commit()
-        await session.refresh(new_donation)
 
     except IntegrityError:
         await session.rollback()
         raise HTTPException(
-            status_code=422,
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail='Нет проектов для распределения'
         )
 
